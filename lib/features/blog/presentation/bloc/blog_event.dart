@@ -1,0 +1,30 @@
+part of 'blog_bloc.dart';
+
+@immutable
+sealed class BlogEvent {
+}
+// Add to BlogEvent
+class CheckContentSafety extends BlogEvent {
+  final String content;
+  final String userId;
+  CheckContentSafety(this.content,this.userId);
+}
+
+final class BlogUploadEvent extends BlogEvent {
+  final String posterId;
+  final String title;
+  final String content;
+  final File image;
+  final List<String> topics;
+
+
+  BlogUploadEvent({
+    required this.posterId,
+    required this.title,
+    required this.content,
+    required this.image,
+    required this.topics,
+  });
+}
+
+final class BlogGetAllEvent extends BlogEvent {}

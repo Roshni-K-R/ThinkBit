@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+
+class BlogContentTextfield extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  const BlogContentTextfield(
+      {super.key,
+      required this.controller,
+      required this.hintText,
+      this.validator,
+      this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintText,
+      ),
+      maxLines: null,
+      onChanged: onChanged, // Pass it through
+      validator: validator,
+    );
+  }
+}
