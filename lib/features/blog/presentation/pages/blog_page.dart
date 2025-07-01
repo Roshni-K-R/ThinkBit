@@ -5,12 +5,16 @@ import 'package:blog_app/features/auth/presentation/pages/login_page.dart';
 import 'package:blog_app/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:blog_app/features/blog/presentation/pages/add_blog_page.dart';
 import 'package:blog_app/features/blog/presentation/widgets/blog_card.dart';
+import 'package:blog_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
+import '../../../../init_dependencies.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_event.dart';
 import '../bloc/blog_state.dart';
 
 class BlogPage extends StatefulWidget {
@@ -43,6 +47,21 @@ class _BlogPageState extends State<BlogPage> {
         //   icon: const Icon(CupertinoIcons.add_circled),
         // ),
         actions: [
+          IconButton(
+            onPressed: () {
+              final user = (context.read<AppUserCubit>().state as AppUserLoggedIn).user;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (_) => serviceLocator<ProfileBloc>()..add(LoadUserProfile(user.id)),
+                    child: ProfilePage(userId: user.id),
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.person),
+          ),
           IconButton(
             onPressed: () {
               // Add this to your logout functionality

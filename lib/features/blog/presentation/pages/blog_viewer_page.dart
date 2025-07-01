@@ -24,7 +24,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   //final List<Map<String, dynamic>> _comments = [];
   bool _showComments = false;
   bool _isLiked = false;
-  int _likeCount = 0;
+  int _likeCount=0;
   bool _isLoading = true;
   late final RealtimeChannel _realtimeChannel;
   final FocusNode _commentFocusNode = FocusNode();
@@ -85,26 +85,24 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   void _setupRealtimeUpdates() {
     _realtimeChannel
       ..onPostgresChanges(
-        event: PostgresChangeEvent.insert,
+        event: PostgresChangeEvent.all, // Use ALL instead of separate insert/delete
         schema: 'public',
         table: 'likes',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'post_id',
+          value: widget.blog.id,
+        ),
         callback: (payload) {
-          if (payload.newRecord['post_id'] == widget.blog.id) {
+          debugPrint('Like update: $payload');
+          if (payload.eventType == 'INSERT') {
             setState(() {
               _likeCount++;
               if (payload.newRecord['user_id'] == _supabase.auth.currentUser?.id) {
                 _isLiked = true;
               }
             });
-          }
-        },
-      )
-      ..onPostgresChanges(
-        event: PostgresChangeEvent.delete,
-        schema: 'public',
-        table: 'likes',
-        callback: (payload) {
-          if (payload.oldRecord['post_id'] == widget.blog.id) {
+          } else if (payload.eventType == 'DELETE') {
             setState(() {
               _likeCount--;
               if (payload.oldRecord['user_id'] == _supabase.auth.currentUser?.id) {
@@ -131,16 +129,18 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) return;
 
+    // Optimistic UI update
     setState(() {
       _isLiked = !_isLiked;
-      _likeCount = _isLiked ? _likeCount + 1 : _likeCount - 1;
+      _likeCount += _isLiked ? 1 : -1;
     });
 
     try {
       if (_isLiked) {
-        await _supabase.from('likes').insert({
+        await _supabase.from('likes').upsert({
           'user_id': userId,
           'post_id': widget.blog.id,
+          'created_at': DateTime.now().toIso8601String(),
         });
       } else {
         await _supabase
@@ -153,11 +153,9 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       // Rollback on error
       setState(() {
         _isLiked = !_isLiked;
-        _likeCount = _isLiked ? _likeCount - 1 : _likeCount + 1;
+        _likeCount += _isLiked ? 1 : -1;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update like')),
-      );
+      debugPrint('Like error: $e');
     }
   }
 

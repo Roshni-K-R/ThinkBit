@@ -2,111 +2,97 @@ part of 'init_dependencies.dart';
 final serviceLocator = GetIt.instance;
 
 
-
 Future<List<String>> loadAbusiveWords() async {
   final data = await rootBundle.loadString('assets/abusive_word.txt');
-  return data.split('\n').map((e) => e.trim().toLowerCase()).toList();
+  return data
+      .split('\n')
+      .map((e) => e.trim().toLowerCase())
+      .where((e) => e.isNotEmpty) // ✅ filter out blank lines
+      .toList();
 }
 
 
-Future<void> initDependencies() async {
 
+Future<void> initDependencies() async {
   _initAuth();
   _initBlog();
-  // Supabase Config
-  serviceLocator.registerLazySingleton(() => Supabase.instance.client);
+  _initProfile();
 
+  // Supabase Client
+  serviceLocator.registerLazySingleton(() => Supabase.instance.client);
 
   // Hive
   final path = (await getApplicationDocumentsDirectory()).path;
   Hive.init(path);
   final blogBox = await Hive.openBox('blogs');
-  serviceLocator.registerLazySingleton(
-    () => blogBox,
-  );
+  serviceLocator.registerLazySingleton(() => blogBox);
 
+  // Internet checker
   serviceLocator.registerFactory(() => InternetConnection());
+  serviceLocator.registerFactory<ConnectionChecker>(() => ConnectionCheckerImpl(serviceLocator()));
 
-  // core
+  // App-level cubit
   serviceLocator.registerLazySingleton(() => AppUserCubit());
-  serviceLocator.registerFactory<ConnectionChecker>(
-    () => ConnectionCheckerImpl(
-      serviceLocator(),
-    ),
-  );
 }
 
 void _initAuth() {
   serviceLocator
     ..registerFactory<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(
-        serviceLocator(),
-      ),
+          () => AuthRemoteDataSourceImpl(serviceLocator()),
     )
     ..registerFactory<AuthRepository>(
-      () => AuthRepositoryImp(
+          () => AuthRepositoryImp(
         serviceLocator(),
         serviceLocator(),
       ),
     )
-    // usecases
-    ..registerFactory(
-      () => UserSignUp(
-        serviceLocator(),
-      ),
-    )
-    ..registerFactory(
-      () => UserLogin(
-        serviceLocator(),
-      ),
-    )
-    ..registerFactory(
-      () => CurrentUser(
-        serviceLocator(),
-      ),
-    )
-    // blocs
-    ..registerLazySingleton(
-      () => AuthBloc(
-        userSignUp: serviceLocator(),
-        userLogin: serviceLocator(),
-        currentUser: serviceLocator(),
-        appUserCubit: serviceLocator(),
-      ),
-    );
+    ..registerFactory(() => UserSignUp(serviceLocator()))
+    ..registerFactory(() => UserLogin(serviceLocator()))
+    ..registerFactory(() => CurrentUser(serviceLocator()))
+    ..registerLazySingleton(() => AuthBloc(
+      userSignUp: serviceLocator(),
+      userLogin: serviceLocator(),
+      currentUser: serviceLocator(),
+      appUserCubit: serviceLocator(),
+    ));
 }
 
 void _initBlog() {
   serviceLocator
     ..registerFactory<BlogLocalDataSource>(
-      () => BlogLocalDataSourceImpl(serviceLocator()),
+          () => BlogLocalDataSourceImpl(serviceLocator()),
     )
     ..registerFactory<BlogRemoteDataSource>(
-      () => BlogRemoteDataSourceImpl(
-        serviceLocator(),
-      ),
+          () => BlogRemoteDataSourceImpl(serviceLocator()),
     )
     ..registerFactory<BlogRepository>(
-      () => BlogRepositoryImpl(
+          () => BlogRepositoryImpl(
         serviceLocator(),
         serviceLocator(),
         serviceLocator(),
         serviceLocator(),
       ),
     )
-    // usecases
-    ..registerFactory(
-      () => UploadBlog(serviceLocator()),
-    )
-    ..registerFactory(
-      () => GetAllBlogs(serviceLocator()),
-    )
-    // blocs
-    ..registerLazySingleton(
-      () => BlogBloc(
-        uploadBlog: serviceLocator(),
-        getAllBlogs: serviceLocator(),
-        blogRepository: serviceLocator(),
-      ),
-    );
+    ..registerFactory(() => UploadBlog(serviceLocator()))
+    ..registerFactory(() => GetAllBlogs(serviceLocator()))
+    ..registerLazySingleton(() => BlogBloc(
+      uploadBlog: serviceLocator(),
+      getAllBlogs: serviceLocator(),
+      blogRepository: serviceLocator(),
+    ));
+}
+
+void _initProfile() {
+  // Repository
+  serviceLocator.registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl());
+
+  // Use Cases
+  serviceLocator.registerFactory(() => GetUserProfile(serviceLocator()));
+  serviceLocator.registerFactory(() => UpdateUserProfile(serviceLocator()));
+
+  // Bloc
+  serviceLocator.registerFactory(() => ProfileBloc(
+    serviceLocator(), // GetUserProfile
+    serviceLocator(), // UpdateUserProfile
+  ));
 }

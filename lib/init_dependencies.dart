@@ -22,4 +22,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/secrets/supabase_config.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
+import 'features/profile/data/repositories/profile_repository_impl.dart';
+import 'features/profile/domain/repository/profile_repository.dart';
+import 'features/profile/domain/usecases/get_user_profile.dart';
+import 'features/profile/domain/usecases/update_user_profile.dart';
+import 'features/profile/presentation/bloc/profile_bloc.dart';
 part 'init_dependencies.main.dart';

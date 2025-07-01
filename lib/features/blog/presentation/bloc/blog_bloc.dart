@@ -67,19 +67,28 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     ));
 
     res.fold(
-          (l) => emit(BlogState.failure(
-        message: l.message,
-        warningCount: state.warningCount,
-        isBlocked: state.isBlocked,
-        showWarning: state.showWarning,
-      )),
+          (l) {
+        // ✅ Intercept if blocked from Supabase (403)
+        final isForbidden = l.message.toLowerCase().contains('403') ||
+            l.message.toLowerCase().contains('blocked');
+
+        emit(BlogState.failure(
+          message: isForbidden
+              ? "You're currently blocked from posting. Try again after your block expires."
+              : l.message,
+          warningCount: state.warningCount,
+          isBlocked: isForbidden ? true : state.isBlocked,
+          showWarning: state.showWarning,
+        ));
+      },
           (r) => emit(BlogState.uploadSuccess(
         warningCount: state.warningCount,
         isBlocked: state.isBlocked,
-        showWarning: state.showWarning,
+        showWarning: false,
       )),
     );
   }
+
 
   Future<void> _fetchAllBlogs(
       BlogGetAllEvent event,
