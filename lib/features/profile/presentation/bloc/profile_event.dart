@@ -16,3 +16,8 @@ class UpdateUserProfileEvent extends ProfileEvent {
 //   final String userId;
 //   GetProfileEvent(this.userId);
 // }
+class LoadUserPostCount extends ProfileEvent {
+  final String userId;
+  LoadUserPostCount(this.userId);
+}
+

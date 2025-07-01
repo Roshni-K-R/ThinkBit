@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../init_dependencies.dart';
+import '../../../discover_users/presentation/pages/discover_users_page.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_event.dart';
 import '../bloc/blog_state.dart';
@@ -62,6 +63,13 @@ class _BlogPageState extends State<BlogPage> {
             },
             icon: const Icon(Icons.person),
           ),
+          IconButton(onPressed: (){
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const DiscoverUsersPage(),
+              ),
+            );
+          }, icon: Icon(Icons.data_exploration_outlined)),
           IconButton(
             onPressed: () {
               // Add this to your logout functionality

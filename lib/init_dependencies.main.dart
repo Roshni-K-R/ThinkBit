@@ -1,38 +1,55 @@
 part of 'init_dependencies.dart';
 final serviceLocator = GetIt.instance;
 
-
 Future<List<String>> loadAbusiveWords() async {
   final data = await rootBundle.loadString('assets/abusive_word.txt');
   return data
       .split('\n')
       .map((e) => e.trim().toLowerCase())
-      .where((e) => e.isNotEmpty) // ✅ filter out blank lines
+      .where((e) => e.isNotEmpty)
       .toList();
 }
-
-
 
 Future<void> initDependencies() async {
   _initAuth();
   _initBlog();
-  _initProfile();
 
-  // Supabase Client
   serviceLocator.registerLazySingleton(() => Supabase.instance.client);
 
-  // Hive
   final path = (await getApplicationDocumentsDirectory()).path;
   Hive.init(path);
   final blogBox = await Hive.openBox('blogs');
   serviceLocator.registerLazySingleton(() => blogBox);
 
-  // Internet checker
   serviceLocator.registerFactory(() => InternetConnection());
-  serviceLocator.registerFactory<ConnectionChecker>(() => ConnectionCheckerImpl(serviceLocator()));
-
-  // App-level cubit
   serviceLocator.registerLazySingleton(() => AppUserCubit());
+  serviceLocator.registerFactory<ConnectionChecker>(
+        () => ConnectionCheckerImpl(serviceLocator()),
+  );
+
+  // Profile Feature
+  serviceLocator.registerFactory<ProfileRepository>(
+        () => ProfileRepositoryImpl(),
+  );
+
+  serviceLocator.registerFactory(() => GetUserProfile(serviceLocator()));
+  serviceLocator.registerFactory(() => UpdateUserProfile(serviceLocator()));
+  serviceLocator.registerFactory(() => GetPostCount(serviceLocator()));
+
+  serviceLocator.registerFactory(
+        () => ProfileBloc(
+      serviceLocator(),
+      serviceLocator(),
+      serviceLocator(),
+    ),
+  );
+
+  // Discover Feature
+  serviceLocator.registerFactory<DiscoverRepository>(
+        () => DiscoverRepositoryImpl(),
+  );
+  serviceLocator.registerFactory(() => GetAllUsersExceptCurrentUsecase(serviceLocator()));
+  serviceLocator.registerFactory(() => DiscoverBloc(serviceLocator()));
 }
 
 void _initAuth() {
@@ -49,12 +66,14 @@ void _initAuth() {
     ..registerFactory(() => UserSignUp(serviceLocator()))
     ..registerFactory(() => UserLogin(serviceLocator()))
     ..registerFactory(() => CurrentUser(serviceLocator()))
-    ..registerLazySingleton(() => AuthBloc(
-      userSignUp: serviceLocator(),
-      userLogin: serviceLocator(),
-      currentUser: serviceLocator(),
-      appUserCubit: serviceLocator(),
-    ));
+    ..registerLazySingleton(
+          () => AuthBloc(
+        userSignUp: serviceLocator(),
+        userLogin: serviceLocator(),
+        currentUser: serviceLocator(),
+        appUserCubit: serviceLocator(),
+      ),
+    );
 }
 
 void _initBlog() {
@@ -75,24 +94,11 @@ void _initBlog() {
     )
     ..registerFactory(() => UploadBlog(serviceLocator()))
     ..registerFactory(() => GetAllBlogs(serviceLocator()))
-    ..registerLazySingleton(() => BlogBloc(
-      uploadBlog: serviceLocator(),
-      getAllBlogs: serviceLocator(),
-      blogRepository: serviceLocator(),
-    ));
-}
-
-void _initProfile() {
-  // Repository
-  serviceLocator.registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl());
-
-  // Use Cases
-  serviceLocator.registerFactory(() => GetUserProfile(serviceLocator()));
-  serviceLocator.registerFactory(() => UpdateUserProfile(serviceLocator()));
-
-  // Bloc
-  serviceLocator.registerFactory(() => ProfileBloc(
-    serviceLocator(), // GetUserProfile
-    serviceLocator(), // UpdateUserProfile
-  ));
+    ..registerLazySingleton(
+          () => BlogBloc(
+        uploadBlog: serviceLocator(),
+        getAllBlogs: serviceLocator(),
+        blogRepository: serviceLocator(),
+      ),
+    );
 }

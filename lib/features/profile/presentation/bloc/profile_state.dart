@@ -6,10 +6,17 @@ class ProfileInitial extends ProfileState {}
 
 class ProfileLoading extends ProfileState {}
 
+// class ProfileLoaded extends ProfileState {
+//   final UserProfile profile;
+//   ProfileLoaded(this.profile);
+// }
 class ProfileLoaded extends ProfileState {
   final UserProfile profile;
-  ProfileLoaded(this.profile);
+  final int postCount;
+
+  ProfileLoaded(this.profile, {this.postCount = 0});
 }
+
 
 class ProfileUpdated extends ProfileState {}
 

@@ -23,4 +23,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
         .eq('id', profile.id);
   }
 
+  @override
+  Future<int> getPostCount(String userId) async {
+    final res = await supabase
+        .from('blogs')
+        .select()
+        .eq('poster_id', userId);
+
+    return res.length;
+  }
+
+
+
 }

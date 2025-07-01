@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../bloc/profile_bloc.dart';
+import '../bloc/profile_state.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 class ProfileStats extends StatelessWidget {
   const ProfileStats({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final postCount = context.select((ProfileBloc bloc) {
+      final state = bloc.state;
+      if (state is ProfileLoaded) return state.postCount;
+      return 0;
+    });
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 30),
       decoration: BoxDecoration(
@@ -16,7 +27,7 @@ class ProfileStats extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildStatItem('234', 'POSTS'),
+          _buildStatItem('$postCount', 'POSTS'),
           _buildStatItem('22K', 'FOLLOWERS'),
           _buildStatItem('1250', 'FOLLOWING'),
           _buildStatItem('4', 'WINS'),

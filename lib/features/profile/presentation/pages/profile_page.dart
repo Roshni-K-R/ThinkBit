@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -41,6 +43,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       curve: Curves.easeInOut,
     );
     context.read<ProfileBloc>().add(LoadUserProfile(widget.userId));
+    context.read<ProfileBloc>().add(LoadUserPostCount(widget.userId));
+
   }
 
   @override
@@ -51,24 +55,62 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     super.dispose();
   }
 
-  void _toggleEditMode() {
+
+  void _toggleEditMode([File? newImage]) async {
     if (_isEditing) {
-      context.read<ProfileBloc>().add(
-        UpdateUserProfileEvent(
-          UserProfile(
-            id: widget.userId,
-            name: _nameController.text,
-            bio: _bioController.text,
-            email: '',
+      String? avatarUrl;
+
+      try {
+        // 📦 Upload image if user selected a new one
+        if (newImage != null) {
+          final fileName = 'avatars/${widget.userId}_${DateTime.now().millisecondsSinceEpoch}.png';
+
+          final bytes = await newImage.readAsBytes();
+          final storageResponse = await Supabase.instance.client.storage
+              .from('avatars')
+              .uploadBinary(
+            fileName,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+          // ✅ Get public URL
+          avatarUrl = Supabase.instance.client.storage
+              .from('avatars')
+              .getPublicUrl(fileName);
+        }
+
+        // 🔄 Update profile
+        context.read<ProfileBloc>().add(
+          UpdateUserProfileEvent(
+            UserProfile(
+              id: widget.userId,
+              name: _nameController.text.trim(),
+              bio: _bioController.text.trim(),
+              avatarUrl: avatarUrl, // optional: if null, avatar stays unchanged
+              email: '', // or remove if not used
+            ),
           ),
-        ),
-      );
-      _animationController.reverse();
+
+        );
+
+
+        _animationController.reverse();
+        setState(() => _isEditing = false);
+      } catch (e) {
+        // ❌ Show error snackbar if something fails
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update profile: $e')),
+          );
+        }
+      }
     } else {
       _animationController.forward();
+      setState(() => _isEditing = true);
     }
-    setState(() => _isEditing = !_isEditing);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +122,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdated) {
+            context.read<ProfileBloc>().add(LoadUserProfile(widget.userId));
+            context.read<ProfileBloc>().add(LoadUserPostCount(widget.userId));
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('✅ Profile updated'),
@@ -173,7 +217,9 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                       _animationController.reverse();
                       setState(() => _isEditing = false);
                     },
-                    onSave: _toggleEditMode,
+                    onSave: (imageFile) {
+                      _toggleEditMode(imageFile);
+                    },
                   ),
                 ],
               );
