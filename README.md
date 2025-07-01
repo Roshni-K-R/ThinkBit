@@ -11,19 +11,19 @@ This is a Flutter blog application built using the BLoC pattern and Clean Archit
 
 ## UI of App
 ### Sign In
-![Login](https://github.com/aliasar1/Blog-App-BLoC-Flutter/blob/main/app_images/1.jpg)
+
 
 ### Sign Up
-![Sign Up](https://github.com/aliasar1/Blog-App-BLoC-Flutter/blob/main/app_images/2.jpg)
+
 
 ### Display BLogs
-![Display BLogs](https://github.com/aliasar1/Blog-App-BLoC-Flutter/blob/main/app_images/3.jpg)
+
 
 ### Add Blogs
-![Add Blogs](https://github.com/aliasar1/Blog-App-BLoC-Flutter/blob/main/app_images/4.jpg)
+
 
 ### Preview Blog Details
-![Preview Blog Details](https://github.com/aliasar1/Blog-App-BLoC-Flutter/blob/main/app_images/5.jpg)
+
 
 ## Architecture Overview
 
