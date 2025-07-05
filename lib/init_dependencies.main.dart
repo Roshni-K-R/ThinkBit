@@ -13,6 +13,7 @@ Future<List<String>> loadAbusiveWords() async {
 Future<void> initDependencies() async {
   _initAuth();
   _initBlog();
+  final perspectiveApiKey = ApiKey.API_KEY;
 
   serviceLocator.registerLazySingleton(() => Supabase.instance.client);
 
@@ -26,6 +27,14 @@ Future<void> initDependencies() async {
   serviceLocator.registerFactory<ConnectionChecker>(
         () => ConnectionCheckerImpl(serviceLocator()),
   );
+
+  //api feature
+  serviceLocator.registerLazySingleton(() => PerspectiveApiService(perspectiveApiKey));
+  serviceLocator.registerLazySingleton<AbuseCheckRepository>(
+        () => AbuseCheckRepositoryImpl(serviceLocator<PerspectiveApiService>()),
+  );
+
+  serviceLocator.registerLazySingleton(() => CheckAbuseUseCase(serviceLocator<AbuseCheckRepository>()));
 
   // Profile Feature
   serviceLocator.registerFactory<ProfileRepository>(

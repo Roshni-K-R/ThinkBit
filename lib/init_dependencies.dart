@@ -1,5 +1,6 @@
 import 'package:blog_app/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:blog_app/core/network/connection_checker.dart';
+import 'package:blog_app/core/secrets/api_key.dart';
 import 'package:blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:blog_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:blog_app/features/auth/domain/repository/auth_repository.dart';
@@ -23,6 +24,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/secrets/supabase_config.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import 'features/blog/data/repositories/abuse_check_repository_impl.dart';
+import 'features/blog/data/service/perspective_api_service.dart';
+import 'features/blog/domain/repository/abuse_check_repository.dart';
+import 'features/blog/domain/usecases/check_abuse_usecase.dart';
 import 'features/discover_users/data/repositories/discover_repository_impl.dart';
 import 'features/discover_users/domain/repositories/discover_repository.dart';
 import 'features/discover_users/domain/usecases/get_all_users_except_current.dart';

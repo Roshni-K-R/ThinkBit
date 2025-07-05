@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
+import '../../../../core/utils/block_checker.dart';
 import '../../domain/entities/user_profile.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
@@ -119,6 +121,29 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar:  AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () async {
+              final userId = (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+
+              // 🔒 Run the block checker
+              final isBlocked = await isUserBlocked(context, userId);
+
+              // Optional: If blocked, don't reload profile
+              if (isBlocked) return;
+
+              // ✅ Reload profile
+              context.read<ProfileBloc>().add(LoadUserProfile(userId));
+            },
+
+          ),
+        ],
+      ),
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdated) {
@@ -144,11 +169,26 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                 _nameController.text = profile.name;
                 _bioController.text = profile.bio ?? '';
               }
+              final statusText = () {
+                if (profile.status == 'permanently_blocked') {
+                  return '🚫 Permanently Blocked';
+                } else if (profile.status == 'blocked') {
+                  return '⛔ Blocked until: ${profile.blockedUntil?.toLocal().toString().split(".").first}';
+                } else {
+                  return '✅ Active';
+                }
+              }();
 
-              final statusText = profile.status == 'blocked'
-                  ? '⛔ Blocked until: ${profile.blockedUntil?.toLocal().toString().split(".").first}'
-                  : '✅ Active';
-              final statusColor = profile.status == 'blocked' ? Colors.red : Colors.green;
+              final statusColor = () {
+                if (profile.status == 'permanently_blocked') {
+                  return Colors.red;
+                } else if (profile.status == 'blocked') {
+                  return Colors.orange;
+                } else {
+                  return Colors.green;
+                }
+              }();
+
 
               return Stack(
                 children: [

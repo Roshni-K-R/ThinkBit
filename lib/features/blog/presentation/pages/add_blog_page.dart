@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:blog_app/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:blog_app/core/common/entities/user.dart';
 import 'package:blog_app/core/common/widgets/loader.dart';
 import 'package:blog_app/core/theme/app_pallete.dart';
 import 'package:blog_app/core/utils/pick_image.dart';
@@ -15,7 +16,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/utils/block_checker.dart';
 import '../../../../init_dependencies.dart';
+import '../../domain/usecases/check_abuse_usecase.dart';
 import '../bloc/blog_state.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/extensions.dart'; // for Document.fromJson
@@ -41,12 +44,17 @@ class _AddBlogPageState extends State<AddBlogPage> {
   File? image;
   Timer? _debounceTimer;
   List<String> abusiveWords = [];
+  late FocusNode _quillFocusNode;
 
   final supabase = Supabase.instance.client;
 
   @override
   void initState() {
     super.initState();
+    _quillFocusNode = FocusNode();
+    _quillFocusNode.addListener(() {
+      setState(() {}); // 🔄 Rebuild to change border color
+    });
     _quillController = QuillController.basic();
     _loadDraft();
     loadAbusiveWords().then((words) {
@@ -142,6 +150,7 @@ class _AddBlogPageState extends State<AddBlogPage> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _quillFocusNode.dispose();
     _titleController.dispose();
     _quillController.dispose();
     //_contentController.dispose();
@@ -158,150 +167,121 @@ class _AddBlogPageState extends State<AddBlogPage> {
     }
   }
 
-  Future<bool> isUserBlocked(String userId) async {
-    try {
-      final res = await Supabase.instance.client
-          .from('profiles')
-          .select('blocked_until, status')
-          .eq('id', userId)
-          .single();
 
-      final blockedUntil = res['blocked_until'];
-      final status = res['status'];
 
-      if (blockedUntil != null) {
-        final now = DateTime.now().toUtc();
-        final unblockTime = DateTime.parse(blockedUntil);
-
-        // 👇 Check if block expired
-        if (now.isAfter(unblockTime)) {
-          // ✅ Unblock the user
-          await Supabase.instance.client
-              .from('profiles')
-              .update({
-            'status': 'active',
-            'blocked_until': null,
-          })
-              .eq('id', userId);
-
-          print("✅ User $userId unblocked automatically.");
-          return false;
-        }
-
-        // ⛔ Still blocked
-        return true;
-      }
-
-      // ✅ No block set
-      return false;
-    } catch (e) {
-      print('❌ Error checking block status: $e');
-      return false;
-    }
-  }
 
 
   Future<void> handleAbusiveAttempt(String userId) async {
-    final user = await supabase.from('profiles').select('warning_count, blocked_until').eq('id', userId).single();
+    final user = await supabase
+        .from('profiles')
+        .select('warning_count, blocked_until, total_warning_count')
+        .eq('id', userId)
+        .single();
+
     int warnings = user['warning_count'] ?? 0;
+    int totalWarnings = user['total_warning_count'] ?? 0;
 
+    // 🟥 Permanent block after 10 total warnings
+    if (totalWarnings + 1 >= 10) {
+      await supabase.from('profiles').update({
+        'status': 'permanently_blocked',
+        'blocked_until': null,
+        'warning_count': 0,
+        'total_warning_count': totalWarnings + 1,
+      }).eq('id', userId);
 
+      showSnackbar(context, "🚫 You have been permanently blocked due to repeated abuse.");
+      return;
+    }
+
+    // ⛔ Temporary block after 3 warnings
     if (warnings >= 2) {
-      // Block the user for 3 days
-      final blockUntil = DateTime.now().toUtc().add(const Duration(minutes: 1));
+      final blockUntil = DateTime.now().toUtc().add(const Duration(minutes:  1)); // 3 days
       await supabase.from('profiles').update({
         'blocked_until': blockUntil.toIso8601String(),
-        'warning_count': 0, // reset warning count
         'status': 'blocked',
+        'warning_count': 0, // reset current count
+        'total_warning_count': totalWarnings + 1, // increment total
       }).eq('id', userId);
 
       showSnackbar(context, "🚫 You are blocked for 3 days due to repeated abuse.");
     } else {
-      // Increment warning count
       await supabase.from('profiles').update({
         'warning_count': warnings + 1,
+        'total_warning_count': totalWarnings + 1,
       }).eq('id', userId);
 
-      showSnackbar(context, " ⚠️ Warning ${warnings + 1}/3: Abusive content detected.");
+      showSnackbar(context, "⚠️ Warning ${warnings + 1}/3: Abusive content detected.");
     }
   }
-  // Future<void> handleAbusiveAttempt(String userId) async {
-  //   final now = DateTime.now().toUtc();
-  //   final cutoff = now.subtract(const Duration(hours: 48));
-  //
-  //   // 1. Count how many attempts in last 48h
-  //   final response = await supabase
-  //       .from('abuse_logs')
-  //       .select()
-  //       .eq('user_id', userId)
-  //       .gte('timestamp', cutoff.toIso8601String());
-  //
-  //   final data = response;
-  //
-  //   final recentWarnings = (data as List).length;
-  //
-  //   // 2. Log this attempt
-  //   await supabase.from('abuse_logs').insert({
-  //   'user_id': userId,
-  //   'timestamp': now.toIso8601String(),
-  //   });
-  //
-  //   if (recentWarnings >= 2) {
-  //   final blockUntil = now.add(const Duration(minutes: 1));
-  //   await supabase.from('profiles').update({
-  //   'blocked_until': blockUntil.toIso8601String(),
-  //   'status': 'blocked',
-  //   }).eq('id', userId);
-  //
-  //   showSnackbar(context, '🚫 You have been blocked for 3 days.');
-  //   } else {
-  //   showSnackbar(context, '⚠️ Warning remove abusive content from the blog ${recentWarnings + 1}/3 in 48h.');
-  //   }
-  // }
+
 
 
 
   void onAddPressed() async {
     final userId = (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
     final title = _titleController.text.trim();
-    final content=_contentController.text.trim();
-    final contentPlain = _quillController.document.toPlainText();
+    final contentPlain = _quillController.document.toPlainText().trim();
 
-    // 🔒 First check: Is user blocked?
-    if (await isUserBlocked(userId)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You are temporarily blocked from posting. Try again later.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+
+    // 🔒 Check: Is user blocked?
+    if (await isUserBlocked(context, userId)) {
       return;
     }
 
-    // 🛑 Check for abusive content
-    if (containsAbusiveLanguage(title) || containsAbusiveLanguage(contentPlain)) {
-      print("⚠️ Abusive detected in content: $contentPlain");
-      await handleAbusiveAttempt(userId); // 👈 add this line
+    // ✅ Step 1: Run form validation first
+    final isFormValid = _formKey.currentState?.validate() ?? false;
+    if (!isFormValid) return;
+
+    // ✅ Step 2: Check if all required fields are present
+    if (selectedTopics.isEmpty || image == null) {
+      showSnackbar(context, 'Please select an image and at least one topic.');
       return;
     }
 
-    if (_formKey.currentState!.validate() &&
-        selectedTopics.isNotEmpty &&
-        image != null) {
-      final posterId =
-          (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
+    // ✅ Step 3: Now it's safe to call abuse detection
+    final abuseCheckUseCase = serviceLocator<CheckAbuseUseCase>();
+    final cleanTitle = normalizeObfuscation(title);
+    final cleanContent = normalizeObfuscation(contentPlain);
 
-      context.read<BlogBloc>().add(
-        BlogUploadEvent(
-          posterId: posterId,
-          title: title,
-          content: contentPlain,
-          image: image!,
-          topics: selectedTopics,
-        ),
-      );
+
+    final isTitleAbusive = await abuseCheckUseCase(cleanTitle);
+    final isContentAbusive = await abuseCheckUseCase(cleanContent);
+
+
+    print("🧠 Title to check: $cleanTitle");
+    print("🧠 Content to check: $cleanContent");
+
+
+    if (isTitleAbusive || isContentAbusive) {
+      await handleAbusiveAttempt(userId);
+      return;
     }
+
+    // ✅ Step 4: Submit blog
+    final posterId = userId;
+    context.read<BlogBloc>().add(
+      BlogUploadEvent(
+        posterId: posterId,
+        title: title,
+        content: contentPlain,
+        image: image!,
+        topics: selectedTopics,
+      ),
+    );
   }
+
+
+  String normalizeObfuscation(String text) {
+    return text
+        .replaceAllMapped(RegExp(r'[\$5]'), (_) => 's')
+        .replaceAllMapped(RegExp(r'[1!|]'), (_) => 'i')
+        .replaceAllMapped(RegExp(r'[@]'), (_) => 'a')
+        .replaceAllMapped(RegExp(r'[0]'), (_) => 'o')
+        .replaceAllMapped(RegExp(r'[\+]'), (_) => 't')
+        .replaceAllMapped(RegExp(r'[\(\[]'), (_) => 'c');
+  }
+
 
 
   @override
@@ -446,7 +426,7 @@ class _AddBlogPageState extends State<AddBlogPage> {
                           return null;
                         },
                       ),
-                      // const SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       // BlogContentTextfield(
                       //   controller: _contentController,
                       //   hintText: "Blog Content",
@@ -460,43 +440,89 @@ class _AddBlogPageState extends State<AddBlogPage> {
                       // ),
                       const SizedBox(height: 10),
 
-                      Container(
-                        //height: 300,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: QuillToolbar.simple(
-                          configurations: QuillSimpleToolbarConfigurations(
-                            controller: _quillController,
-                          ),
-                        ),
-                      ),
+                      // Container(
+                      //   //height: 300,
+                      //   decoration: BoxDecoration(
+                      //     border: Border.all(color: Colors.grey),
+                      //     borderRadius: BorderRadius.circular(5),
+                      //   ),
+                      //   child: QuillToolbar.simple(
+                      //     configurations: QuillSimpleToolbarConfigurations(
+                      //       controller: _quillController,
+                      //     ),
+                      //   ),
+                      // ),
 
                       const SizedBox(height: 10),
-                      Container(
-                        height: 300,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: QuillEditor(
-                          configurations: QuillEditorConfigurations(
-                            controller: _quillController,
-                            scrollable: true,
-                            autoFocus: false,
-                            //readOnly: false,
-                            padding: const EdgeInsets.all(10),
-                            expands: false,
-                            sharedConfigurations: const QuillSharedConfigurations(
-                              locale: Locale('en'),
-                            ),
-                          ),
-                          focusNode: FocusNode(),
-                          scrollController: ScrollController(),
-                        ),
-
+                      FormField<String>(
+                        validator: (_) {
+                          if (_quillController.document.toPlainText().trim().isEmpty) {
+                            return 'Content is missing';
+                          }
+                          return null;
+                        },
+                        builder: (state) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  if (_quillController.document.isEmpty() && !_quillFocusNode.hasFocus)
+                                    const Positioned(
+                                      top: 27,
+                                      left: 27,
+                                      child: Text(
+                                        'Enter blog content',
+                                        style: TextStyle(
+                                          color: Colors.white60,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: state.hasError
+                                            ? Colors.redAccent
+                                            : (_quillFocusNode.hasFocus
+                                            ? AppPallete.gradient2
+                                            : AppPallete.borderColor),
+                                        width: 3,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: QuillEditor(
+                                      configurations: QuillEditorConfigurations(
+                                        controller: _quillController,
+                                        scrollable: false,
+                                        padding: const EdgeInsets.all(27),
+                                        expands: false,
+                                        autoFocus: false,
+                                        sharedConfigurations: const QuillSharedConfigurations(
+                                          locale: Locale('en'),
+                                        ),
+                                      ),
+                                      focusNode: _quillFocusNode,
+                                      scrollController: ScrollController(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (state.hasError)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+                                  child: Text(
+                                    state.errorText ?? '',
+                                    style: const TextStyle(color: AppPallete.gradient3, fontSize: 13),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
                       ),
+
+
                       const SizedBox(height: 40),
                       Padding(
                         padding: const EdgeInsets.symmetric(

@@ -6,6 +6,9 @@ class UserProfile {
   final DateTime? blockedUntil;
   final String? status;
   final String? bio;
+  final int? followerCount;
+  final int? followingCount;
+
 
   const UserProfile({
     required this.id,
@@ -15,6 +18,8 @@ class UserProfile {
     this.blockedUntil,
     this.status,
     this.bio,
+    this.followerCount,
+    this.followingCount,
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
@@ -62,4 +67,6 @@ class UserProfile {
       bio: bio?? this.bio,
     );
   }
+
+
 }
