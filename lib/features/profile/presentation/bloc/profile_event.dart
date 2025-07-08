@@ -21,3 +21,22 @@ class LoadUserPostCount extends ProfileEvent {
   LoadUserPostCount(this.userId);
 }
 
+class StreamFollowerCount extends ProfileEvent {
+  final String userId;
+  StreamFollowerCount(this.userId);
+}
+
+class StreamFollowingCount extends ProfileEvent {
+  final String userId;
+  StreamFollowingCount(this.userId);
+}
+
+class UpdateFollowerCount extends ProfileEvent {
+  final int count;
+  UpdateFollowerCount(this.count);
+}
+
+class UpdateFollowingCount extends ProfileEvent {
+  final int count;
+  UpdateFollowingCount(this.count);
+}

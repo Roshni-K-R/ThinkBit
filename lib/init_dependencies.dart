@@ -32,8 +32,12 @@ import 'features/discover_users/data/repositories/discover_repository_impl.dart'
 import 'features/discover_users/domain/repositories/discover_repository.dart';
 import 'features/discover_users/domain/usecases/get_all_users_except_current.dart';
 import 'features/discover_users/presentation/bloc/discover_bloc.dart';
+import 'features/profile/data/repositories/follower_repository_Impl.dart';
 import 'features/profile/data/repositories/profile_repository_impl.dart';
+import 'features/profile/domain/repository/follower_repository.dart';
 import 'features/profile/domain/repository/profile_repository.dart';
+import 'features/profile/domain/usecases/follower_count_usecase.dart';
+import 'features/profile/domain/usecases/following_count_usecase.dart';
 import 'features/profile/domain/usecases/get_post_count.dart';
 import 'features/profile/domain/usecases/get_user_profile.dart';
 import 'features/profile/domain/usecases/update_user_profile.dart';

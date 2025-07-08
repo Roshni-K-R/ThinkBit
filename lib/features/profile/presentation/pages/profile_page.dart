@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blog_app/features/profile/domain/usecases/get_post_count.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -46,6 +47,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
     context.read<ProfileBloc>().add(LoadUserProfile(widget.userId));
     context.read<ProfileBloc>().add(LoadUserPostCount(widget.userId));
+    context.read<ProfileBloc>().add(StreamFollowerCount(widget.userId));
+    context.read<ProfileBloc>().add(StreamFollowingCount(widget.userId));
 
   }
 
@@ -139,6 +142,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
 
               // ✅ Reload profile
               context.read<ProfileBloc>().add(LoadUserProfile(userId));
+              context.read<ProfileBloc>().add(StreamFollowerCount(userId));
+              context.read<ProfileBloc>().add(StreamFollowingCount(userId));
             },
 
           ),
@@ -201,7 +206,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                           statusText: statusText,
                           statusColor: statusColor,
                         ),
-                        const ProfileStats(),
+                        ProfileStats(
+                          postCount: state.postCount,
+                          followerCount: state.followerCount,
+                          followingCount: state.followingCount,
+                        ),
+
                         // Add your content section here
                         Padding(
                           padding: const EdgeInsets.all(20.0),

@@ -41,12 +41,23 @@ Future<void> initDependencies() async {
         () => ProfileRepositoryImpl(),
   );
 
+  serviceLocator.registerLazySingleton<FollowerRepository>(
+        () => FollowerRepositoryImpl(serviceLocator()),
+  );
+
+
   serviceLocator.registerFactory(() => GetUserProfile(serviceLocator()));
   serviceLocator.registerFactory(() => UpdateUserProfile(serviceLocator()));
   serviceLocator.registerFactory(() => GetPostCount(serviceLocator()));
+  serviceLocator.registerFactory(() => StreamFollowerCountUseCase(serviceLocator()));
+  serviceLocator.registerFactory(() => StreamFollowingCountUseCase(serviceLocator()));
+
+
 
   serviceLocator.registerFactory(
         () => ProfileBloc(
+      serviceLocator(),
+      serviceLocator(),
       serviceLocator(),
       serviceLocator(),
       serviceLocator(),

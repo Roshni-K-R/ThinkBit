@@ -6,7 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileStats extends StatelessWidget {
-  const ProfileStats({super.key});
+  final int postCount;
+  final int followerCount;
+  final int followingCount;
+
+  const ProfileStats({
+    super.key,
+    required this.postCount,
+    required this.followerCount,
+    required this.followingCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +37,8 @@ class ProfileStats extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildStatItem('$postCount', 'POSTS'),
-          _buildStatItem('22K', 'FOLLOWERS'),
-          _buildStatItem('1250', 'FOLLOWING'),
-          _buildStatItem('4', 'WINS'),
+          _buildStatItem('$followerCount', 'FOLLOWERS'),
+          _buildStatItem('$followingCount', 'FOLLOWING'),
         ],
       ),
     );
