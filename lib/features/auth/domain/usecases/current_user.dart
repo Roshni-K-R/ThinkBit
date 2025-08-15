@@ -1,5 +1,5 @@
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/core/usecase/usecase.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/core/usecase/usecase.dart';
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/common/entities/user.dart';

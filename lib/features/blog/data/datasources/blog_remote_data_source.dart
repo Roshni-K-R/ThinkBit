@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:blog_app/core/errors/exceptions.dart';
-import 'package:blog_app/features/blog/data/models/blog_model.dart';
+import 'package:ThinkBit/core/errors/exceptions.dart';
+import 'package:ThinkBit/features/blog/data/models/blog_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {

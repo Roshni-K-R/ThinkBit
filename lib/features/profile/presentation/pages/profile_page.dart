@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:blog_app/features/profile/domain/usecases/get_post_count.dart';
+import 'package:ThinkBit/features/profile/domain/usecases/get_post_count.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -123,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     final email = user?.email ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
       appBar:  AppBar(
         title: const Text('Profile'),
         backgroundColor: Colors.transparent,
@@ -231,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                //color: Colors.white,
                               ),
                             ),
                           ),

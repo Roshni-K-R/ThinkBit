@@ -1,7 +1,7 @@
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/core/usecase/usecase.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
-import 'package:blog_app/features/blog/domain/repository/blog_repository.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/core/usecase/usecase.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/features/blog/domain/repository/blog_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
 class GetAllBlogs implements UseCase<List<Blog>, NoParams> {

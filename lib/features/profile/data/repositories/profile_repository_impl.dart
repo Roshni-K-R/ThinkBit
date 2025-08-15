@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:blog_app/features/profile/domain/entities/user_profile.dart';
-import 'package:blog_app/features/profile/domain/repository/profile_repository.dart';
+import 'package:ThinkBit/features/profile/domain/entities/user_profile.dart';
+import 'package:ThinkBit/features/profile/domain/repository/profile_repository.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final supabase = Supabase.instance.client;

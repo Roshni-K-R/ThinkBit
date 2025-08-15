@@ -1,7 +1,7 @@
-import 'package:blog_app/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:blog_app/core/usecase/usecase.dart';
-import 'package:blog_app/features/auth/domain/usecases/user_login.dart';
-import 'package:blog_app/features/auth/domain/usecases/user_sign_up.dart';
+import 'package:ThinkBit/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:ThinkBit/core/usecase/usecase.dart';
+import 'package:ThinkBit/features/auth/domain/usecases/user_login.dart';
+import 'package:ThinkBit/features/auth/domain/usecases/user_sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

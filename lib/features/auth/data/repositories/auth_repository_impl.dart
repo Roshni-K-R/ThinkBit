@@ -1,10 +1,10 @@
-import 'package:blog_app/core/errors/exceptions.dart';
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/core/network/connection_checker.dart';
-import 'package:blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:blog_app/core/common/entities/user.dart';
-import 'package:blog_app/features/auth/data/models/user_model.dart';
-import 'package:blog_app/features/auth/domain/repository/auth_repository.dart';
+import 'package:ThinkBit/core/errors/exceptions.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/core/network/connection_checker.dart';
+import 'package:ThinkBit/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:ThinkBit/core/common/entities/user.dart';
+import 'package:ThinkBit/features/auth/data/models/user_model.dart';
+import 'package:ThinkBit/features/auth/domain/repository/auth_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
 class AuthRepositoryImp implements AuthRepository {

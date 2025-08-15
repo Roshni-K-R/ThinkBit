@@ -1,6 +1,6 @@
-import 'package:blog_app/core/utils/calculate_reading_time.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
-import 'package:blog_app/features/blog/presentation/pages/blog_viewer_page.dart';
+import 'package:ThinkBit/core/utils/calculate_reading_time.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/features/blog/presentation/pages/blog_viewer_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

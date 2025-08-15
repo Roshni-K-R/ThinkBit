@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:blog_app/features/profile/domain/entities/user_profile.dart';
+import 'package:ThinkBit/core/theme/app_pallete.dart';
+import 'package:ThinkBit/features/profile/domain/entities/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -119,7 +120,7 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
         return Transform.translate(
           offset: Offset(
             0,
-            (1 - widget.animation.value) * MediaQuery.of(context).size.height,
+            (1.28 - widget.animation.value) * MediaQuery.of(context).size.height,
           ),
           child: child,
         );
@@ -131,20 +132,20 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black.withOpacity(0.7),
-              Colors.black.withOpacity(0.9),
+              Colors.white.withOpacity(0.7),
+              Colors.white.withOpacity(0.9),
             ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
-        padding: const EdgeInsets.fromLTRB(25, 50, 25, 30),
+        padding: const EdgeInsets.fromLTRB(25, 25, 25, 30),
         child: Column(
           children: [
             // Header without border
             SizedBox(
               width: double.infinity,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15),
+                padding: const EdgeInsets.symmetric(vertical: 25),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -153,7 +154,8 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        //color: Colors.white,
+                        color: AppPallete.textColor,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -181,7 +183,8 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
+                        //color: Colors.white.withOpacity(0.3),
+                        color: Colors.black.withOpacity(0.4),
                         width: 2,
                       ),
                     ),
@@ -215,8 +218,9 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: Colors.white.withOpacity(0.1),
-                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        //color: Colors.white.withOpacity(0.1),
+                        color: Colors.black.withOpacity(0.7),
+                        border: Border.all(color: Colors.black.withOpacity(0.2)),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
@@ -228,7 +232,9 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
                             child: TextFormField(
                               controller: widget.nameController,
                               style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
+                                  color: Colors.white,
+                                  //color: Colors.black,
+                                  fontSize: 16),
                               decoration: const InputDecoration(
                                 labelText: 'Name',
                                 labelStyle: TextStyle(
@@ -250,7 +256,8 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: Colors.white.withOpacity(0.3),
+                        //color: Colors.white.withOpacity(0.3),
+                        color: Colors.black.withOpacity(0.7),
                         border: Border.all(color: Colors.white.withOpacity(0.2)),
                       ),
                       child: ClipRRect(
@@ -315,7 +322,7 @@ class _EditProfilePanelState extends State<EditProfilePanel> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                             letterSpacing: 1.2,
                           ),
                         ),

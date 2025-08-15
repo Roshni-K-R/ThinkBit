@@ -1,19 +1,29 @@
-import 'package:blog_app/core/common/widgets/loader.dart';
-import 'package:blog_app/core/theme/app_pallete.dart';
-import 'package:blog_app/core/utils/show_snackbar.dart';
-import 'package:blog_app/features/auth/presentation/pages/login_page.dart';
-import 'package:blog_app/features/blog/presentation/bloc/blog_bloc.dart';
-import 'package:blog_app/features/blog/presentation/pages/add_blog_page.dart';
-import 'package:blog_app/features/blog/presentation/widgets/blog_card.dart';
-import 'package:blog_app/features/profile/presentation/pages/profile_page.dart';
+import 'package:ThinkBit/core/common/widgets/loader.dart';
+import 'package:ThinkBit/core/theme/app_pallete.dart';
+import 'package:ThinkBit/core/utils/show_snackbar.dart';
+import 'package:ThinkBit/features/auth/presentation/pages/login_page.dart';
+import 'package:ThinkBit/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:ThinkBit/features/blog/presentation/pages/add_blog_page.dart';
+import 'package:ThinkBit/features/blog/presentation/widgets/blog_card.dart';
+import 'package:ThinkBit/features/profile/presentation/pages/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../init_dependencies.dart';
+import '../../../discover_users/domain/usecases/get_all_users_except_current.dart';
+import '../../../discover_users/presentation/bloc/discover_bloc.dart';
+import '../../../discover_users/presentation/bloc/discover_event.dart';
 import '../../../discover_users/presentation/pages/discover_users_page.dart';
+import '../../../follow/domain/usecase/check_follow_status.dart';
+import '../../../follow/domain/usecase/follow_user_usecase.dart';
+import '../../../follow/domain/usecase/follow_user_usecase.dart';
+import '../../../follow/domain/usecase/unfollow_user_usecase.dart';
+import '../../../follow/presentation/bloc/follow_bloc.dart';
+import '../../../follow/presentation/bloc/follow_event.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_event.dart';
 import '../bloc/blog_state.dart';
@@ -63,13 +73,58 @@ class _BlogPageState extends State<BlogPage> {
             },
             icon: const Icon(Icons.person),
           ),
-          IconButton(onPressed: (){
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const DiscoverUsersPage(),
-              ),
-            );
-          }, icon: Icon(Icons.data_exploration_outlined)),
+          // IconButton(
+          //   onPressed: () {
+          //     final user = (context.read<AppUserCubit>().state as AppUserLoggedIn).user;
+          //
+          //     Navigator.of(context).push(
+          //       MaterialPageRoute(
+          //         builder: (context) {
+          //           final currentUser = (context.read<AppUserCubit>().state as AppUserLoggedIn).user;
+          //           return MultiBlocProvider(
+          //             providers: [
+          //               BlocProvider(
+          //                 create: (_) => FollowBloc(
+          //                   followUser: serviceLocator<FollowUserUseCase>(),
+          //                   unfollowUser: serviceLocator<UnfollowUserUseCase>(),
+          //                   getAllFollowingUseCase: serviceLocator<GetAllFollowingUseCase>(),
+          //                 )..add(LoadFollowingUsersEvent(currentUser.id)),
+          //               ),
+          //               BlocProvider(
+          //                 create: (_) => DiscoverBloc(
+          //                   serviceLocator<GetAllUsersExceptCurrentUsecase>(),
+          //                 )..add(LoadAllUsersExceptCurrent(currentUser.id)),
+          //               ),
+          //             ],
+          //             child: DiscoverUsersPage(currentUserId: currentUser.id),
+          //           );
+          //         },
+          //       ),
+          //     );
+          //
+          //   },
+          //   icon: const Icon(Icons.data_exploration_outlined),
+          // ),
+          IconButton(
+            icon: Icon(Icons.person_search),
+            tooltip: 'Discover Users',
+            onPressed: () {
+              final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+
+              if (currentUserId != null) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => DiscoverUsersPage(currentUserId: currentUserId),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('You must be logged in to discover users.')),
+                );
+              }
+            },
+          ),
+
           IconButton(
             onPressed: () {
               // Add this to your logout functionality
@@ -90,7 +145,9 @@ class _BlogPageState extends State<BlogPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+
+
+        floatingActionButton: FloatingActionButton(
         // onPressed: () {
         //   Navigator.push(context, AddBlogPage.route());
         // },

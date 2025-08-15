@@ -1,3 +1,4 @@
+import 'package:ThinkBit/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 import '../bloc/profile_bloc.dart';
@@ -53,6 +54,7 @@ class ProfileStats extends StatelessWidget {
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            //color: AppPallete.textColor
           ),
         ),
         const SizedBox(height: 5),
@@ -60,6 +62,7 @@ class ProfileStats extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 14,
+            //color: Colors.black.withOpacity(0.7)
             color: Colors.white.withOpacity(0.7),
           ),
         ),

@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:blog_app/core/errors/exceptions.dart';
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/core/network/connection_checker.dart';
-import 'package:blog_app/features/blog/data/datasources/blog_local_data_source.dart';
-import 'package:blog_app/features/blog/data/datasources/blog_remote_data_source.dart';
-import 'package:blog_app/features/blog/data/models/blog_model.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
-import 'package:blog_app/features/blog/domain/repository/blog_repository.dart';
+import 'package:ThinkBit/core/errors/exceptions.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/core/network/connection_checker.dart';
+import 'package:ThinkBit/features/blog/data/datasources/blog_local_data_source.dart';
+import 'package:ThinkBit/features/blog/data/datasources/blog_remote_data_source.dart';
+import 'package:ThinkBit/features/blog/data/models/blog_model.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/features/blog/domain/repository/blog_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';

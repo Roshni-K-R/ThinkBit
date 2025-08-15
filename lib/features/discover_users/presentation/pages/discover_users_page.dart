@@ -1,57 +1,55 @@
+import 'package:ThinkBit/features/discover_users/presentation/pages/discover_user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:blog_app/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:ThinkBit/core/common/cubits/app_user/app_user_cubit.dart';
 import '../../../../init_dependencies.dart';
+import '../../../follow/domain/usecase/check_follow_status.dart';
+import '../../../follow/domain/usecase/follow_user_usecase.dart';
+import '../../../follow/domain/usecase/unfollow_user_usecase.dart';
+import '../../../follow/presentation/bloc/follow_bloc.dart';
+import '../../../follow/presentation/bloc/follow_event.dart';
+import '../../../follow/presentation/bloc/follow_state.dart';
 import '../../domain/usecases/get_all_users_except_current.dart';
 import '../bloc/discover_bloc.dart';
 import '../bloc/discover_event.dart';
-import '../bloc/discover_state.dart';
 
-class DiscoverUsersPage extends StatelessWidget {
-  const DiscoverUsersPage({super.key});
+
+class DiscoverUsersPage extends StatefulWidget {
+  const DiscoverUsersPage({super.key, required this.currentUserId});
+
+  final String currentUserId;
+
+  @override
+  State<DiscoverUsersPage> createState() => _DiscoverUsersPageState();
+}
+
+class _DiscoverUsersPageState extends State<DiscoverUsersPage> {
+
+
 
   @override
   Widget build(BuildContext context) {
-    final currentUser =
-        (context.read<AppUserCubit>().state as AppUserLoggedIn).user;
-
     return Scaffold(
       appBar: AppBar(title: const Text("Discover Users")),
-      body: BlocProvider(
-        create: (context) {
-          final bloc = DiscoverBloc(serviceLocator<GetAllUsersExceptCurrentUsecase>());
-          bloc.add(LoadAllUsersExceptCurrent(currentUser.id)); // Updated event name
-          return bloc;
-        },
-        child: BlocBuilder<DiscoverBloc, DiscoverState>(
-          builder: (context, state) {
-            if (state is DiscoverLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is DiscoverLoaded) {
-              return ListView.builder(
-                itemCount: state.users.length,
-                itemBuilder: (context, index) {
-                  final user = state.users[index];
-                  return ListTile(
-                    leading: CircleAvatar(child: Text(user.name[0])),
-                    title: Text(user.name),
-                    subtitle: Text("ID: ${user.id}"),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        // Handle follow logic
-                      },
-                      child: const Text("Follow"),
-                    ),
-                  );
-                },
-              );
-            } else if (state is DiscoverError) {
-              return Center(child: Text("Error: ${state.message}"));
-            } else {
-              return const Center(child: Text("No users found."));
-            }
-          },
-        ),
+      body: MultiBlocProvider(
+        providers: [
+          // ✅ Provide FollowBloc
+          BlocProvider<FollowBloc>(
+            create: (context) => FollowBloc(
+              followUser: serviceLocator<FollowUserUseCase>(),
+              unfollowUser: serviceLocator<UnfollowUserUseCase>(),
+              getAllFollowingUseCase: serviceLocator<GetAllFollowingUseCase>(),
+            )..add(LoadFollowingUsersEvent(widget.currentUserId)), // load follow list
+          ),
+
+          // ✅ Provide DiscoverBloc
+          BlocProvider<DiscoverBloc>(
+            create: (context) => DiscoverBloc(
+              serviceLocator<GetAllUsersExceptCurrentUsecase>(),
+            )..add(LoadAllUsersExceptCurrent(widget.currentUserId)), // load users
+          ),
+        ],
+        child: DiscoverUserList(currentUserId: widget.currentUserId),
       ),
     );
   }

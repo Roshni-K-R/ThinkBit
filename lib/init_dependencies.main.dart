@@ -64,6 +64,17 @@ Future<void> initDependencies() async {
     ),
   );
 
+  serviceLocator.registerFactory(() => FollowUserUseCase(serviceLocator()));
+  serviceLocator.registerFactory(() => UnfollowUserUseCase(serviceLocator()));
+  //serviceLocator.registerFactory(() => CheckFollowingStatusUseCase(serviceLocator()));
+  serviceLocator.registerFactory(() => GetAllFollowingUseCase(serviceLocator()));
+  serviceLocator.registerFactory(() => FollowBloc(
+    followUser: serviceLocator(),
+    unfollowUser: serviceLocator(),
+   // checkFollowingStatus: serviceLocator(),
+    getAllFollowingUseCase: serviceLocator(),
+  ));
+
   // Discover Feature
   serviceLocator.registerFactory<DiscoverRepository>(
         () => DiscoverRepositoryImpl(),

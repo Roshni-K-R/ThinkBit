@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
 import 'package:fpdart/fpdart.dart';
 
 abstract interface class BlogRepository {

@@ -1,6 +1,6 @@
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/core/usecase/usecase.dart';
-import 'package:blog_app/features/auth/domain/repository/auth_repository.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/core/usecase/usecase.dart';
+import 'package:ThinkBit/features/auth/domain/repository/auth_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/common/entities/user.dart';

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/user_profile.dart';
-import '../../domain/usecases/follower_count_usecase.dart';
-import '../../domain/usecases/following_count_usecase.dart';
+import '../../../follow/domain/usecase/follower_count_usecase.dart';
+import '../../../follow/domain/usecase/following_count_usecase.dart';
 import '../../domain/usecases/get_post_count.dart';
 import '../../domain/usecases/get_user_profile.dart';
 import '../../domain/usecases/update_user_profile.dart';

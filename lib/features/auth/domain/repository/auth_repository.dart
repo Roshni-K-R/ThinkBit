@@ -1,5 +1,5 @@
-import 'package:blog_app/core/errors/failure.dart';
-import 'package:blog_app/core/common/entities/user.dart';
+import 'package:ThinkBit/core/errors/failure.dart';
+import 'package:ThinkBit/core/common/entities/user.dart';
 import 'package:fpdart/fpdart.dart';
 
 abstract interface class AuthRepository {

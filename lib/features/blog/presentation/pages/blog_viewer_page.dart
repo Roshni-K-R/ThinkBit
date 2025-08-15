@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:blog_app/core/theme/app_pallete.dart';
-import 'package:blog_app/core/utils/calculate_reading_time.dart';
-import 'package:blog_app/core/utils/format_date.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/core/theme/app_pallete.dart';
+import 'package:ThinkBit/core/utils/calculate_reading_time.dart';
+import 'package:ThinkBit/core/utils/format_date.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 

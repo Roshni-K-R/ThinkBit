@@ -1,4 +1,4 @@
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
 
 class BlogModel extends Blog {
   BlogModel({

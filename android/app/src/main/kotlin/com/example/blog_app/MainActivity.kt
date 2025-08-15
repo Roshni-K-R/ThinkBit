@@ -1,4 +1,4 @@
-package com.example.blog_app
+package com.example.ThinkBit
 
 import io.flutter.embedding.android.FlutterActivity
 

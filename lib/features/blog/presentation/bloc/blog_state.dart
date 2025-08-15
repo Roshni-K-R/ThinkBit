@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
 
 part 'blog_state.freezed.dart';
 

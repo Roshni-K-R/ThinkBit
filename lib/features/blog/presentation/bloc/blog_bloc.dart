@@ -1,13 +1,13 @@
 // blog_bloc.dart
 import 'dart:io';
 
-import 'package:blog_app/core/usecase/usecase.dart';
-import 'package:blog_app/features/blog/domain/entities/blog.dart';
-import 'package:blog_app/features/blog/domain/usecases/get_all_blogs.dart';
-import 'package:blog_app/features/blog/domain/usecases/check_content_safty.dart';
-import 'package:blog_app/features/blog/domain/usecases/upload_blog.dart';
-import 'package:blog_app/features/blog/domain/repository/blog_repository.dart';
-import 'package:blog_app/features/blog/presentation/bloc/blog_state.dart';
+import 'package:ThinkBit/core/usecase/usecase.dart';
+import 'package:ThinkBit/features/blog/domain/entities/blog.dart';
+import 'package:ThinkBit/features/blog/domain/usecases/get_all_blogs.dart';
+import 'package:ThinkBit/features/blog/domain/usecases/check_content_safty.dart';
+import 'package:ThinkBit/features/blog/domain/usecases/upload_blog.dart';
+import 'package:ThinkBit/features/blog/domain/repository/blog_repository.dart';
+import 'package:ThinkBit/features/blog/presentation/bloc/blog_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
