@@ -6,8 +6,12 @@ This is a Flutter blog application built using the BLoC pattern and Clean Archit
 
 - User Authentication (Login & Signup)
 - Display Blogs
-- Add New Blog
+- Add New Blog (with abuse detection)
 - Offline Storage with Hive
+- save draft
+- Like and comment on blogs
+- view and edit profile
+- 
 
 ## UI of App
 ### Sign In
@@ -23,6 +27,10 @@ This is a Flutter blog application built using the BLoC pattern and Clean Archit
 
 
 ### Preview Blog Details
+
+### Edit Profile
+
+### Discover Users
 
 
 ## Architecture Overview
