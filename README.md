@@ -100,3 +100,16 @@ lib
 - [hive_flutter](https://pub.dev/packages/hive_flutter)
 - [supabase](https://pub.dev/packages/supabase)
 - [cached_network_image](https://pub.dev/packages/cached_network_image)
+
+## Screenshots
+
+![sign-up](https://github.com/user-attachments/assets/cb84794c-76a4-4791-89c6-9ba1df503894)
+![blog-list](https://github.com/user-attachments/assets/7b9be13f-e884-40f3-9932-f84fb29f9bdb)
+![temporary block](https://github.com/user-attachments/assets/57559ea8-4288-4847-86e7-8105121a6194)
+![view blog](https://github.com/user-attachments/assets/8fb91b19-ec1c-461f-bf83-27e9272d274e)
+![missing-field](https://github.com/user-attachments/assets/3f9054d3-e3de-40a8-818f-dc0d324ef222)
+![editProfile](https://github.com/user-attachments/assets/126922ec-2431-4163-a103-a725c879dcdb)
+
+
+
+
